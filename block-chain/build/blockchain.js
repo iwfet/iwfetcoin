@@ -50,7 +50,6 @@ const getUnspentTxOuts = () => _.cloneDeep(unspentTxOuts);
 exports.getUnspentTxOuts = getUnspentTxOuts;
 // and txPool should be only updated at the same time
 const setUnspentTxOuts = (newUnspentTxOut) => {
-    console.log('replacing unspentTxouts with: %s', newUnspentTxOut);
     unspentTxOuts = newUnspentTxOut;
 };
 const getLatestBlock = () => blockchain[blockchain.length - 1];
@@ -208,8 +207,6 @@ const hashMatchesDifficulty = (hash, difficulty) => {
     Checks if the given blockchain is valid. Return the unspent txOuts if the chain is valid
  */
 const isValidChain = (blockchainToValidate) => {
-    console.log('isValidChain:');
-    console.log(JSON.stringify(blockchainToValidate));
     const isValidGenesis = (block) => {
         return JSON.stringify(block) === JSON.stringify(genesisBlock);
     };

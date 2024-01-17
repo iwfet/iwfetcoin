@@ -100,7 +100,6 @@ const filterTxPoolTxs = (unspentTxOuts, transactionPool) => {
     return lodash_1.default.without(unspentTxOuts, ...removable);
 };
 const createTransaction = (receiverAddress, amount, privateKey, unspentTxOuts, txPool) => {
-    console.log('txPool: %s', JSON.stringify(txPool));
     const myAddress = (0, transaction_1.getPublicKey)(privateKey);
     const myUnspentTxOutsA = unspentTxOuts.filter((uTxO) => uTxO.address === myAddress);
     const myUnspentTxOuts = filterTxPoolTxs(myUnspentTxOutsA, txPool);

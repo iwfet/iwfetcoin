@@ -18,7 +18,7 @@ const addToTransactionPool = (tx, unspentTxOuts) => {
     if (!isValidTxForPool(tx, transactionPool)) {
         throw Error('Trying to add invalid tx to pool');
     }
-    console.log('adding to txPool: %s', JSON.stringify(tx));
+
     transactionPool.push(tx);
 };
 exports.addToTransactionPool = addToTransactionPool;
@@ -39,7 +39,6 @@ const updateTransactionPool = (unspentTxOuts) => {
         }
     }
     if (invalidTxs.length > 0) {
-        console.log('removing the following transactions from txPool: %s', JSON.stringify(invalidTxs));
         transactionPool = lodash_1.default.without(transactionPool, ...invalidTxs);
     }
 };

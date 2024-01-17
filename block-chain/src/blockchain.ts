@@ -207,8 +207,6 @@ const hashMatchesDifficulty = (hash: string, difficulty: number): boolean => {
     Checks if the given blockchain is valid. Return the unspent txOuts if the chain is valid
  */
 const isValidChain = (blockchainToValidate: Block[]): UnspentTxOut[] => {
-    console.log('isValidChain:');
-    console.log(JSON.stringify(blockchainToValidate));
     const isValidGenesis = (block: Block): boolean => {
         return JSON.stringify(block) === JSON.stringify(genesisBlock);
     };
