@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 import {Server} from 'ws';
-import {addBlockToChain, getBlockchain, getLatestBlock, replaceChain} from './blockchain';
+import {addBlockToChain, getBlockchain, getLatestBlock,replaceChain} from './blockchain';
 import { MessageType } from './enum/MessageType';
 import { JSONToObject } from './util/p2p/JSONToObject';
 import { Block } from './model/Block';

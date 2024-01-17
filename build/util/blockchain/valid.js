@@ -28,6 +28,14 @@ const isValidNewBlock = (newBlock, previousBlock) => {
     return true;
 };
 exports.isValidNewBlock = isValidNewBlock;
+const isValidBlockStructure = (block) => {
+    return typeof block.index === 'number'
+        && typeof block.hash === 'string'
+        && typeof block.previousHash === 'string'
+        && typeof block.timestamp === 'number'
+        && typeof block.data === 'object';
+};
+exports.isValidBlockStructure = isValidBlockStructure;
 const isValidTimestamp = (newBlock, previousBlock) => {
     return (previousBlock.timestamp - 60 < newBlock.timestamp)
         && newBlock.timestamp - 60 < (0, timesTamp_1.getCurrentTimestamp)();
@@ -61,12 +69,4 @@ const isValidChain = (blockchainToValidate) => {
     return true;
 };
 exports.isValidChain = isValidChain;
-const isValidBlockStructure = (block) => {
-    return typeof block.index === 'number'
-        && typeof block.hash === 'string'
-        && typeof block.previousHash === 'string'
-        && typeof block.timestamp === 'number'
-        && typeof block.data === 'string';
-};
-exports.isValidBlockStructure = isValidBlockStructure;
 //# sourceMappingURL=valid.js.map

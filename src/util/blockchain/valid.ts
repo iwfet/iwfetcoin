@@ -24,6 +24,13 @@ const isValidNewBlock = (newBlock: Block, previousBlock: Block): boolean => {
     return true;
 };
 
+const isValidBlockStructure = (block: Block): boolean => {
+    return typeof block.index === 'number'
+        && typeof block.hash === 'string'
+        && typeof block.previousHash === 'string'
+        && typeof block.timestamp === 'number'
+        && typeof block.data === 'object';
+};
 
 
 const isValidTimestamp = (newBlock: Block, previousBlock: Block): boolean => {
@@ -71,13 +78,10 @@ const isValidChain = (blockchainToValidate: Block[]): boolean => {
 
 
 
-const isValidBlockStructure = (block: Block): boolean => {
-    return typeof block.index === 'number'
-        && typeof block.hash === 'string'
-        && typeof block.previousHash === 'string'
-        && typeof block.timestamp === 'number'
-        && typeof block.data === 'string';
-};
+
+
+
+
 
 
 
