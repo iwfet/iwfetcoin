@@ -24,6 +24,12 @@ const initP2PServer = (p2pPort) => {
         initConnection(ws);
     });
     console.log('listening websocket p2p port on: ' + p2pPort);
+    setTimeout(() => {
+        const perr = process.env.PEERS;
+        console.log(!!perr);
+        if (!!perr)
+            connectToPeers(perr);
+    }, 1000);
 };
 exports.initP2PServer = initP2PServer;
 const getSockets = () => sockets;

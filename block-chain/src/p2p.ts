@@ -27,9 +27,15 @@ class Message {
 const initP2PServer = (p2pPort: number) => {
     const server: Server = new WebSocket.Server({port: p2pPort});
     server.on('connection', (ws: WebSocket) => {
-        initConnection(ws);
+        initConnection(ws);  
     });
+    
     console.log('listening websocket p2p port on: ' + p2pPort);
+    setTimeout(() => {
+        const perr = process.env.PEERS
+        console.log(!!perr);
+        if(!!perr) connectToPeers(perr)
+    }, 1000);
 };
 
 const getSockets = () => sockets;

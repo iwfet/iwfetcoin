@@ -43,7 +43,7 @@ const setUnspentTxOuts = (newUnspentTxOut: UnspentTxOut[]) => {
 const getLatestBlock = (): Block => blockchain[blockchain.length - 1];
 
 // in seconds
-const BLOCK_GENERATION_INTERVAL: number = 10;
+const BLOCK_GENERATION_INTERVAL: number = 60;
 
 // in blocks
 const DIFFICULTY_ADJUSTMENT_INTERVAL: number = 10;

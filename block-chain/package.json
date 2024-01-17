@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node build/main.js",
     "compile": "tsc",
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "start-docker":"tsc &&  docker-compose up --build "
   },
   "keywords": [],
   "author": "",

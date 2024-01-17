@@ -1,0 +1,79 @@
+version: '2'
+services:
+  node1:
+    environment:
+      - HOST=0.0.0.0
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+    - "3005:3005"
+    - "6005:6005"
+    volumes:
+    - ./:/block-chain
+
+  node2:
+    environment:      
+      - HOST=0.0.0.0
+      - PEERS=ws://node1:6005  
+      - P2P_PORT=6006    
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+    - "3006:3005"
+    - "6006:6006"
+    volumes:
+    - ./:/block-chain
+    links:
+      - node1:node1
+
+
+  node3:
+    environment:
+      - HOST=0.0.0.0
+      - PEERS=ws://node1:6005 
+      - P2P_PORT=6007    
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+    - "3007:3005"
+    - "6007:6007"
+    volumes:
+    - ./:/block-chain
+    links:
+      - node2:node2
+
+  node4:
+    environment:
+      - HOST=0.0.0.0
+      - PEERS=ws://node1:6005 
+      - P2P_PORT=6008    
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+    - "3008:3005"
+    - "6008:6008"
+    volumes:
+    - ./:/block-chain
+    links:
+      - node2:node2
+
+
+  node5:
+    environment:
+      - HOST=0.0.0.0
+      - PEERS=ws://node1:6005 
+      - P2P_PORT=6009    
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+    - "3009:3005"
+    - "6009:6009"
+    volumes:
+    - ./:/block-chain
+    links:
+      - node2:node2
