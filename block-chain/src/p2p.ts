@@ -4,6 +4,7 @@ import {
     addBlockToChain,  getBlockchain, getLatestBlock, handleReceivedTransaction, isValidBlockStructure,
     replaceChain
 } from './blockchain';
+
 import {getTransactionPool} from './transactionPool';
 import { Block } from './model/Block';
 import { Transaction } from './model/Transaction';

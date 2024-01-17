@@ -1,11 +1,11 @@
 import {ec} from 'elliptic';
 import {existsSync, readFileSync, unlinkSync, writeFileSync} from 'fs';
-import  _ from 'lodash';
-import { getPublicKey, getTransactionId, signTxIn } from './transaction';
+import _ from 'lodash';
+import {getPublicKey, getTransactionId, signTxIn} from './transaction';
 import { UnspentTxOut } from './model/UnspentTxOut';
+import { TxOut } from './model/TxOut';
 import { Transaction } from './model/Transaction';
 import { TxIn } from './model/TxIn';
-import { TxOut } from './model/TxOut';
 
 const EC = new ec('secp256k1');
 const privateKeyLocation = process.env.PRIVATE_KEY || 'node/wallet/private_key';

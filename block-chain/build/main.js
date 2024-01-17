@@ -44,7 +44,7 @@ const initHttpServer = (myHttpPort) => {
     app.get('/myUnspentTransactionOutputs', (req, res) => {
         res.send((0, blockchain_1.getMyUnspentTransactionOutputs)());
     });
-    app.post('/mineRawBlock', (req, res) => {
+    app.post('/mintRawBlock', (req, res) => {
         if (req.body.data == null) {
             res.send('data parameter is missing');
             return;
@@ -57,7 +57,7 @@ const initHttpServer = (myHttpPort) => {
             res.send(newBlock);
         }
     });
-    app.post('/mineBlock', (req, res) => {
+    app.post('/mintBlock', (req, res) => {
         const newBlock = (0, blockchain_1.generateNextBlock)();
         if (newBlock === null) {
             res.status(400).send('could not generate block');
@@ -74,7 +74,7 @@ const initHttpServer = (myHttpPort) => {
         const address = (0, wallet_1.getPublicFromWallet)();
         res.send({ 'address': address });
     });
-    app.post('/mineTransaction', (req, res) => {
+    app.post('/mintTransaction', (req, res) => {
         const address = req.body.address;
         const amount = req.body.amount;
         try {

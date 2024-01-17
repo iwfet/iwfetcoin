@@ -1,36 +1,16 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addBlockToChain = exports.replaceChain = exports.isValidBlockStructure = exports.getAccountBalance = exports.getMyUnspentTransactionOutputs = exports.handleReceivedTransaction = exports.generatenextBlockWithTransaction = exports.generateNextBlock = exports.generateRawNextBlock = exports.sendTransaction = exports.getLatestBlock = exports.getUnspentTxOuts = exports.getBlockchain = void 0;
-const CryptoJS = __importStar(require("crypto-js"));
-const _ = __importStar(require("lodash"));
+const crypto_js_1 = __importDefault(require("crypto-js"));
+const lodash_1 = __importDefault(require("lodash"));
 const p2p_1 = require("./p2p");
 const transaction_1 = require("./transaction");
 const transactionPool_1 = require("./transactionPool");
-const util_1 = require("./util");
 const wallet_1 = require("./wallet");
+const bignumber_js_1 = require("bignumber.js");
 const Block_1 = require("./model/Block");
 const genesisTransaction = {
     'txIns': [{ 'signature': '', 'txOutId': '', 'txOutIndex': 0 }],
@@ -40,13 +20,15 @@ const genesisTransaction = {
         }],
     'id': 'e655f6a5f26dc9b4cac6e46f52336428287759cf81ef5ff10854f69d68f43fa3'
 };
-const genesisBlock = new Block_1.Block(0, '91a73664bc84c0baa1fc75ea6e4aa6d1d20c5df664c724e3159aefc2e1186627', '', 1465154705, [genesisTransaction], 0, 0);
+const genesisBlock = new Block_1.Block(0, '91a73664bc84c0baa1fc75ea6e4aa6d1d20c5df664c724e3159aefc2e1186627', '', 1465154705, [genesisTransaction], 0, 0, "04bfcab8722991ae774db48f934ca79cfb7dd991229153b9f732ba5334aafcd8e7266e47076996b55a14bf9913ee3145ce0cfc1372ada8ada74bd287450313534a");
+// Number of blocks that can be minted with accounts without any coins
+const mintingWithoutCoinIndex = 100;
 let blockchain = [genesisBlock];
 // the unspent txOut of genesis block is set to unspentTxOuts on startup
 let unspentTxOuts = (0, transaction_1.processTransactions)(blockchain[0].data, [], 0);
 const getBlockchain = () => blockchain;
 exports.getBlockchain = getBlockchain;
-const getUnspentTxOuts = () => _.cloneDeep(unspentTxOuts);
+const getUnspentTxOuts = () => lodash_1.default.cloneDeep(unspentTxOuts);
 exports.getUnspentTxOuts = getUnspentTxOuts;
 // and txPool should be only updated at the same time
 const setUnspentTxOuts = (newUnspentTxOut) => {
@@ -86,8 +68,7 @@ const generateRawNextBlock = (blockData) => {
     const previousBlock = getLatestBlock();
     const difficulty = getDifficulty(getBlockchain());
     const nextIndex = previousBlock.index + 1;
-    const nextTimestamp = getCurrentTimestamp();
-    const newBlock = findBlock(nextIndex, previousBlock.hash, nextTimestamp, blockData, difficulty);
+    const newBlock = findBlock(nextIndex, previousBlock.hash, blockData, difficulty);
     if (addBlockToChain(newBlock)) {
         (0, p2p_1.broadcastLatest)();
         return newBlock;
@@ -121,14 +102,17 @@ const generatenextBlockWithTransaction = (receiverAddress, amount) => {
     return generateRawNextBlock(blockData);
 };
 exports.generatenextBlockWithTransaction = generatenextBlockWithTransaction;
-const findBlock = (index, previousHash, timestamp, data, difficulty) => {
-    let nonce = 0;
+const findBlock = (index, previousHash, data, difficulty) => {
+    let pastTimestamp = 0;
     while (true) {
-        const hash = calculateHash(index, previousHash, timestamp, data, difficulty, nonce);
-        if (hashMatchesDifficulty(hash, difficulty)) {
-            return new Block_1.Block(index, hash, previousHash, timestamp, data, difficulty, nonce);
+        let timestamp = getCurrentTimestamp();
+        if (pastTimestamp !== timestamp) {
+            let hash = calculateHash(index, previousHash, timestamp, data, difficulty, getAccountBalance(), (0, wallet_1.getPublicFromWallet)());
+            if (isBlockStakingValid(previousHash, (0, wallet_1.getPublicFromWallet)(), timestamp, getAccountBalance(), difficulty, index)) {
+                return new Block_1.Block(index, hash, previousHash, timestamp, data, difficulty, getAccountBalance(), (0, wallet_1.getPublicFromWallet)());
+            }
+            pastTimestamp = timestamp;
         }
-        nonce++;
     }
 };
 const getAccountBalance = () => {
@@ -142,14 +126,18 @@ const sendTransaction = (address, amount) => {
     return tx;
 };
 exports.sendTransaction = sendTransaction;
-const calculateHashForBlock = (block) => calculateHash(block.index, block.previousHash, block.timestamp, block.data, block.difficulty, block.nonce);
-const calculateHash = (index, previousHash, timestamp, data, difficulty, nonce) => CryptoJS.SHA256(index + previousHash + timestamp + data + difficulty + nonce).toString();
+const calculateHashForBlock = (block) => calculateHash(block.index, block.previousHash, block.timestamp, block.data, block.difficulty, block.minterBalance, block.minterAddress);
+const calculateHash = (index, previousHash, timestamp, data, difficulty, minterBalance, minterAddress) => crypto_js_1.default.SHA256(index + previousHash + timestamp + data + difficulty + minterBalance + minterAddress).toString();
+// The hash for Proof of Stake does not include a nonce to avoid more than one trial per second
 const isValidBlockStructure = (block) => {
     return typeof block.index === 'number'
         && typeof block.hash === 'string'
         && typeof block.previousHash === 'string'
         && typeof block.timestamp === 'number'
-        && typeof block.data === 'object';
+        && typeof block.data === 'object'
+        && typeof block.difficulty === 'number'
+        && typeof block.minterBalance === 'number'
+        && typeof block.minterAddress === 'string';
 };
 exports.isValidBlockStructure = isValidBlockStructure;
 const isValidNewBlock = (newBlock, previousBlock) => {
@@ -189,8 +177,8 @@ const hasValidHash = (block) => {
         console.log('invalid hash, got:' + block.hash);
         return false;
     }
-    if (!hashMatchesDifficulty(block.hash, block.difficulty)) {
-        console.log('block difficulty not satisfied. Expected: ' + block.difficulty + 'got: ' + block.hash);
+    if (!isBlockStakingValid(block.previousHash, block.minterAddress, block.minterBalance, block.timestamp, block.difficulty, block.index)) {
+        console.log('staking hash not lower than balance over diffculty times 2^256');
     }
     return true;
 };
@@ -198,15 +186,27 @@ const hashMatchesBlockContent = (block) => {
     const blockHash = calculateHashForBlock(block);
     return blockHash === block.hash;
 };
-const hashMatchesDifficulty = (hash, difficulty) => {
-    const hashInBinary = (0, util_1.hexToBinary)(hash);
-    const requiredPrefix = '0'.repeat(difficulty);
-    return hashInBinary.startsWith(requiredPrefix);
+// This function is used for proof of stake
+// Based on `SHA256(prevhash + address + timestamp) <= 2^256 * balance / diff`
+// Cf https://blog.ethereum.org/2014/07/05/stake/
+const isBlockStakingValid = (prevhash, address, timestamp, balance, difficulty, index) => {
+    difficulty = difficulty + 1;
+    // Allow minting without coins for a few blocks
+    if (index <= mintingWithoutCoinIndex) {
+        balance = balance + 1;
+    }
+    const balanceOverDifficulty = new bignumber_js_1.BigNumber(2).exponentiatedBy(256).times(balance).dividedBy(difficulty);
+    const stakingHash = crypto_js_1.default.SHA256(prevhash + address + timestamp).toString();
+    const decimalStakingHash = new bignumber_js_1.BigNumber(stakingHash, 16);
+    const difference = balanceOverDifficulty.minus(decimalStakingHash).toNumber();
+    return difference >= 0;
 };
 /*
     Checks if the given blockchain is valid. Return the unspent txOuts if the chain is valid
  */
 const isValidChain = (blockchainToValidate) => {
+    console.log('isValidChain:');
+    console.log(JSON.stringify(blockchainToValidate));
     const isValidGenesis = (block) => {
         return JSON.stringify(block) === JSON.stringify(genesisBlock);
     };

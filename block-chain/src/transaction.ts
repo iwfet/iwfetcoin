@@ -220,7 +220,7 @@ const toHexString = (byteArray): string => {
 };
 
 const getPublicKey = (aPrivateKey: string): string => {
-    return ec.keyFromPrivate(aPrivateKey, 'hex').getPublic().encode('hex', false);
+    return ec.keyFromPrivate(aPrivateKey, 'hex').getPublic().encode('hex',false);
 };
 
 const isValidTxInStructure = (txIn: TxIn): boolean => {
@@ -306,5 +306,5 @@ const isValidAddress = (address: string): boolean => {
 export {
     processTransactions, signTxIn, getTransactionId, isValidAddress, validateTransaction,
     getCoinbaseTransaction, getPublicKey, hasDuplicates
-
+   
 };

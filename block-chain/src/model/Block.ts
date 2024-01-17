@@ -8,17 +8,19 @@ export class Block {
     public timestamp: number;
     public data: Transaction[];
     public difficulty: number;
-    public nonce: number;
+    public minterBalance: number; // hack to avoid recaculating the balance of the minter at a precise height
+    public minterAddress: string;
 
     constructor(index: number, hash: string, previousHash: string,
-                timestamp: number, data: Transaction[], difficulty: number, nonce: number) {
+                timestamp: number, data: Transaction[], difficulty: number, minterBalance: number, minterAddress: string) {
         this.index = index;
         this.previousHash = previousHash;
         this.timestamp = timestamp;
         this.data = data;
         this.hash = hash;
         this.difficulty = difficulty;
-        this.nonce = nonce;
+        this.minterBalance = minterBalance;
+        this.minterAddress = minterAddress;
     }
 }
 

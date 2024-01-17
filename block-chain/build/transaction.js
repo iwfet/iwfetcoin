@@ -266,6 +266,7 @@ const isValidTransactionStructure = (transaction) => {
 // valid address is a valid ecdsa public key in the 04 + X-coordinate + Y-coordinate format
 const isValidAddress = (address) => {
     if (address.length !== 130) {
+        console.log(address);
         console.log('invalid public key length');
         return false;
     }

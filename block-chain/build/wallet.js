@@ -8,9 +8,9 @@ const elliptic_1 = require("elliptic");
 const fs_1 = require("fs");
 const lodash_1 = __importDefault(require("lodash"));
 const transaction_1 = require("./transaction");
+const TxOut_1 = require("./model/TxOut");
 const Transaction_1 = require("./model/Transaction");
 const TxIn_1 = require("./model/TxIn");
-const TxOut_1 = require("./model/TxOut");
 const EC = new elliptic_1.ec('secp256k1');
 const privateKeyLocation = process.env.PRIVATE_KEY || 'node/wallet/private_key';
 const getPrivateFromWallet = () => {
@@ -100,6 +100,7 @@ const filterTxPoolTxs = (unspentTxOuts, transactionPool) => {
     return lodash_1.default.without(unspentTxOuts, ...removable);
 };
 const createTransaction = (receiverAddress, amount, privateKey, unspentTxOuts, txPool) => {
+    console.log('txPool: %s', JSON.stringify(txPool));
     const myAddress = (0, transaction_1.getPublicKey)(privateKey);
     const myUnspentTxOutsA = unspentTxOuts.filter((uTxO) => uTxO.address === myAddress);
     const myUnspentTxOuts = filterTxPoolTxs(myUnspentTxOutsA, txPool);

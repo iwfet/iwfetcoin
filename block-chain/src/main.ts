@@ -1,15 +1,15 @@
-import   bodyParser from 'body-parser';
-import  express from 'express';
-import  _ from 'lodash';
+import  bodyParser from 'body-parser';
+import express from 'express';
+import _ from 'lodash';
 import {
-    generateNextBlock, generatenextBlockWithTransaction, generateRawNextBlock, getAccountBalance,
+     generateNextBlock, generatenextBlockWithTransaction, generateRawNextBlock, getAccountBalance,
     getBlockchain, getMyUnspentTransactionOutputs, getUnspentTxOuts, sendTransaction
 } from './blockchain';
 import {connectToPeers, getSockets, initP2PServer} from './p2p';
 import {getTransactionPool} from './transactionPool';
 import {getPublicFromWallet, initWallet} from './wallet';
-import { Block } from './model/Block';
 import { UnspentTxOut } from './model/UnspentTxOut';
+import { Block } from './model/Block';
 
 const httpPort: number = parseInt(process.env.HTTP_PORT) || 3005;
 const p2pPort: number = parseInt(process.env.P2P_PORT) || 6005;
@@ -55,7 +55,7 @@ const initHttpServer = (myHttpPort: number) => {
         res.send(getMyUnspentTransactionOutputs());
     });
 
-    app.post('/mineRawBlock', (req, res) => {
+    app.post('/mintRawBlock', (req, res) => {
         if (req.body.data == null) {
             res.send('data parameter is missing');
             return;
@@ -68,7 +68,7 @@ const initHttpServer = (myHttpPort: number) => {
         }
     });
 
-    app.post('/mineBlock', (req, res) => {
+    app.post('/mintBlock', (req, res) => {
         const newBlock: Block = generateNextBlock();
         if (newBlock === null) {
             res.status(400).send('could not generate block');
@@ -87,7 +87,7 @@ const initHttpServer = (myHttpPort: number) => {
         res.send({'address': address});
     });
 
-    app.post('/mineTransaction', (req, res) => {
+    app.post('/mintTransaction', (req, res) => {
         const address = req.body.address;
         const amount = req.body.amount;
         try {

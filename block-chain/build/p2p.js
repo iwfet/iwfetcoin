@@ -55,6 +55,7 @@ const initMessageHandler = (ws) => {
                 console.log('could not parse received JSON message: ' + data);
                 return;
             }
+            console.log('Received message: %s', JSON.stringify(message));
             switch (message.type) {
                 case MessageType.QUERY_LATEST:
                     write(ws, responseLatestMsg());
@@ -137,6 +138,8 @@ const handleBlockchainResponse = (receivedBlocks) => {
     }
     const latestBlockHeld = (0, blockchain_1.getLatestBlock)();
     if (latestBlockReceived.index > latestBlockHeld.index) {
+        console.log('blockchain possibly behind. We got: '
+            + latestBlockHeld.index + ' Peer got: ' + latestBlockReceived.index);
         if (latestBlockHeld.hash === latestBlockReceived.previousHash) {
             if ((0, blockchain_1.addBlockToChain)(latestBlockReceived)) {
                 broadcast(responseLatestMsg());
