@@ -220,7 +220,7 @@ const toHexString = (byteArray): string => {
 };
 
 const getPublicKey = (aPrivateKey: string): string => {
-    return ec.keyFromPrivate(aPrivateKey, 'hex').getPublic().encode('hex',false);
+    return ec.keyFromPrivate(aPrivateKey, 'hex').getPublic().encode('hex', false);
 };
 
 const isValidTxInStructure = (txIn: TxIn): boolean => {
